@@ -25,6 +25,7 @@ import (
 
 
 func Ctx() {
+    fmt.Println("main thread start")
 	// 创建一个根上下文
 	rootCtx := context.Background()
 
@@ -36,6 +37,7 @@ func Ctx() {
 	// 创建一个用于接收结果的通道
 	resultChan := make(chan int)
 
+    fmt.Println("main thread set up a new task")
 	// 启动一个并发任务
 	go func(ctx context.Context) {
 		// 模拟一些耗时的操作
@@ -66,4 +68,43 @@ func Ctx() {
 	case <-ctx.Done():
         fmt.Println("main thread Task timed out")
 	}
+    time.Sleep(3 * time.Second)
+    fmt.Println("main thread exit")
+}
+
+func Ctx_cancel() {
+    fmt.Println("main thread start")
+    // 创建一个带有取消功能的上下文
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+
+    fmt.Println("main thread set up a new task")
+	// 启动一个并发任务
+    go func(ctx context.Context) {
+        pc, _, _, _ := runtime.Caller(1)
+        currentFunction := runtime.FuncForPC(pc).Name()
+        fmt.Println("[", currentFunction, "] ", "start")
+
+		for {
+			select {
+			case <-ctx.Done():
+                fmt.Println("[", currentFunction, "] ", "Task canceled")
+				return
+			default:
+				// 模拟一些耗时的操作
+				time.Sleep(1 * time.Second)
+                fmt.Println("[", currentFunction, "] ", "Doing some work...")
+			}
+		}
+
+    }(ctx)
+
+    // 模拟一段时间后取消上下文
+    time.Sleep(3 * time.Second)
+    fmt.Println("main thread cancel ctx")
+    cancel()
+
+    // 等待一段时间以观察输出
+    time.Sleep(2 * time.Second)
+    fmt.Println("main thread exit")
 }

@@ -6,9 +6,12 @@ import (
 )
 
 func main() {
-	third.Prompt()
-	third.Select()
-	third.Ctx()
+	// third.Prompt()
+	// third.Select()
+	// third.Ctx()
+	// third.Ctx_cancel()
+	// third.CaptureCtrlC()
+	third.Execute()
 
 	fmt.Print(1)
 }
